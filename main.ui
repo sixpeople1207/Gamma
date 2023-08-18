@@ -1772,9 +1772,9 @@ QPushButton:pressed {
                    <widget class="QWidget" name="horizontalLayoutWidget_4">
                     <property name="geometry">
                      <rect>
-                      <x>-1</x>
+                      <x>9</x>
                       <y>59</y>
-                      <width>791</width>
+                      <width>781</width>
                       <height>101</height>
                      </rect>
                     </property>
@@ -1782,6 +1782,55 @@ QPushButton:pressed {
                      <property name="spacing">
                       <number>1</number>
                      </property>
+                     <item>
+                      <widget class="QLabel" name="pic_1">
+                       <property name="text">
+                        <string/>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="pic_2">
+                       <property name="text">
+                        <string/>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="pic_3">
+                       <property name="text">
+                        <string/>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="pic_4">
+                       <property name="text">
+                        <string/>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="pic_5">
+                       <property name="text">
+                        <string/>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="pic_6">
+                       <property name="text">
+                        <string/>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="pic_7">
+                       <property name="text">
+                        <string/>
+                       </property>
+                      </widget>
+                     </item>
                     </layout>
                    </widget>
                    <widget class="Line" name="line_3">
@@ -1800,13 +1849,24 @@ QPushButton:pressed {
                    <widget class="QWidget" name="horizontalLayoutWidget_5">
                     <property name="geometry">
                      <rect>
-                      <x>0</x>
+                      <x>10</x>
                       <y>180</y>
-                      <width>791</width>
+                      <width>781</width>
                       <height>301</height>
                      </rect>
                     </property>
-                    <layout class="QHBoxLayout" name="layout_ImagePreviewZoom"/>
+                    <layout class="QHBoxLayout" name="layout_ImagePreviewZoom">
+                     <property name="spacing">
+                      <number>2</number>
+                     </property>
+                     <item>
+                      <widget class="QLabel" name="pic_Zoom">
+                       <property name="text">
+                        <string/>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
                    </widget>
                    <widget class="QWidget" name="">
                     <property name="geometry">

@@ -9,7 +9,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication , QMainWindow, QFileDialog, QAction, QLabel, QSizePolicy
 from PyQt5.QtGui import *
 import sys
-from PyQt5.QtCore import Qt, QPoint, QCoreApplication, QObject, pyqtSignal, QEvent
+from PyQt5.QtCore import Qt, QPoint, QCoreApplication, QObject, pyqtSignal, QEvent, QRect
 
 form_class = uic.loadUiType('./main.ui')[0]
 
@@ -26,17 +26,22 @@ class MainWindows(QMainWindow, form_class):
 		self.btn_Left_2.clicked.connect(self.change_page)
 		self.btn_Right_1.clicked.connect(self.change_page)
 		self.btn_Right_2.clicked.connect(self.change_page)
+		self.index = 0
+		self.objName_Li = [self.pic_1,self.pic_2,self.pic_3,self.pic_4,self.pic_5,self.pic_6,self.pic_7]
 		self.obj = []
 		#UI업데이트 :  pyrcc5 -o rc_rc.py rc.qrc
-		for i in range(0,6):
-			self.imageLabel = QLabel()
+		#8개가 가장 보기 좋음. 
+		for i in range(0,7):
+			self.imageLabel = self.objName_Li[i]
 			self.pixmap = QPixmap()
 			self.pixmap.load('D:\\개인_프로그래밍 개발\\OpenCV_Source\\1.jpg')
 			self.pixmap = self.pixmap.scaled(100,80)
 			self.imageLabel.setPixmap(self.pixmap)
-			self.layout_ImagePreview.addWidget(self.imageLabel, i)
-			self.clickable(self.imageLabel).connect(self.zoom_Image)
+			self.imageLabel.setAlignment(Qt.AlignVCenter)
+			# self.layout_ImagePreview.addWidget(self.imageLabel, i)
 			self.obj.append(self.imageLabel)
+			self.clickable(self.imageLabel).connect(self.zoom_Image)
+			
 			#이미지 파일도 받아와서 클릭하면 크게 보여줄 수 있게 수정.
 		self.isMaximized = 0
 		self.btn_settings.clicked.connect(self.change_page)
@@ -50,7 +55,9 @@ class MainWindows(QMainWindow, form_class):
 					if event.type() == QEvent.MouseButtonPress:
 						if obj.rect().contains(event.pos()):
 							self.clicked.emit()
-							print(obj)
+							# for objName in self.objName_Li:
+							# 	if objName == obj:
+							# 		print(objName)
 							# The developer can opt for .emit(obj) to get the object within the slot.
 							return True
 				return False
@@ -59,7 +66,9 @@ class MainWindows(QMainWindow, form_class):
 		return filter.clicked
 	
 	def zoom_Image(self):
-		print(self.obj)
+		print(self.sender())
+		if self.sender()==self.pic_1:
+			print("맞습니다")
 
 	def change_page(self):
 		print(self.stackedWidget.currentIndex())
