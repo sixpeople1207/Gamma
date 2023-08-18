@@ -1,0 +1,89 @@
+import win32gui
+import win32api
+import win32con
+ 
+# WM_CREATE가 안생겨서 만든 WM_CREATE 대용 메시지
+UM_CREATE=win32con.WM_USER + 1
+ 
+PAINT_CNT=0
+ 
+def WndProc(hwnd, iMsg, wParam, lParam):
+    global PAINT_CNT
+     
+    if iMsg == UM_CREATE:
+        print("create!")
+        return 0
+    elif iMsg == win32con.WM_DESTROY:
+        print("destroy!")
+        win32gui.PostQuitMessage(0)
+        return 0
+ 
+    elif iMsg == win32con.WM_PAINT:
+        if PAINT_CNT == 0:
+            print("paint")
+            PAINT_CNT=1
+        return 0
+    elif iMsg == win32con.WM_CLOSE:
+        win32gui.DestroyWindow(hwnd)
+ 
+    return win32gui.DefWindowProc(hwnd, iMsg, wParam, lParam)
+     
+ 
+def WinMain():
+    hInstance = win32api.GetModuleHandle()
+ 
+ 
+    className = 'SimpleWin32'
+ 
+    wndClass                = win32gui.WNDCLASS()
+    wndClass.style          = win32con.CS_HREDRAW | win32con.CS_VREDRAW
+    wndClass.lpfnWndProc    = WndProc
+    wndClass.hInstance      = hInstance
+    wndClass.hIcon          = win32gui.LoadIcon(0, win32con.IDI_APPLICATION)
+    wndClass.hCursor        = win32gui.LoadCursor(0, win32con.IDC_ARROW)
+    wndClass.hbrBackground  = win32gui.GetStockObject(win32con.WHITE_BRUSH)
+    wndClass.lpszClassName  = className
+ 
+ 
+    wndClassAtom = None
+    wndClassAtom = win32gui.RegisterClass(wndClass)
+ 
+    hwnd = win32gui.CreateWindow(
+        wndClassAtom,
+        "title test",
+        win32con.WS_OVERLAPPEDWINDOW,
+        win32con.CW_USEDEFAULT,
+        win32con.CW_USEDEFAULT,
+        win32con.CW_USEDEFAULT,
+        win32con.CW_USEDEFAULT,
+        0,
+        0,
+        hInstance,
+        None)
+     
+    win32gui.SendMessage(hwnd, UM_CREATE, 0, 0)
+    
+    win32gui.AnimateWindow(hwnd, 500, win32con.AW_CENTER)
+    #win32gui.ShowWindow(hwnd, win32con.SW_SHOWNORMAL)
+    win32gui.UpdateWindow(hwnd)
+ 
+    win32gui.PumpMessages()
+    return 0
+     
+    '''
+    msg = win32gui.GetMessage(hwnd, 0, 0)
+    msg = msg[1]
+ 
+ 
+    while msg[1]:
+        win32gui.TranslateMessage(msg)
+        win32gui.DispatchMessage(msg)
+        msg = win32gui.GetMessage(hwnd, 0, 0)
+        msg = msg[1]
+     
+    return msg[2]
+    '''
+ 
+ 
+if __name__ == "__main__":
+    x = WinMain()
