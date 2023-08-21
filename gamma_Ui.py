@@ -12,7 +12,6 @@ import sys
 from PyQt5.QtCore import Qt, QPoint, QCoreApplication, QObject, pyqtSignal, QEvent, QRect
 
 form_class = uic.loadUiType('./main.ui')[0]
-
 class MainWindows(QMainWindow, form_class):
 	def __init__(self):
 		super().__init__()
@@ -29,6 +28,8 @@ class MainWindows(QMainWindow, form_class):
 		self.index = 0
 		self.objName_Li = [self.pic_1,self.pic_2,self.pic_3,self.pic_4,self.pic_5,self.pic_6,self.pic_7]
 		self.obj = []
+		self.filters = []
+		
 		#UI업데이트 :  pyrcc5 -o rc_rc.py rc.qrc
 		#8개가 가장 보기 좋음. 
 		for i in range(0,7):
@@ -40,14 +41,14 @@ class MainWindows(QMainWindow, form_class):
 			self.imageLabel.setAlignment(Qt.AlignVCenter)
 			# self.layout_ImagePreview.addWidget(self.imageLabel, i)
 			self.obj.append(self.imageLabel)
-			self.clickable(self.imageLabel).connect(self.zoom_Image)
-			
+			self.clickable(self.imageLabel,self.obj,self.filters).connect(self.zoom_Image)
 			#이미지 파일도 받아와서 클릭하면 크게 보여줄 수 있게 수정.
 		self.isMaximized = 0
 		self.btn_settings.clicked.connect(self.change_page)
 
+	
 	# Label에 클릭 이벤트를 연결.
-	def clickable(self,widget):
+	def clickable(self,widget,objlist,filters):
 		class Filter(QObject):
 			clicked = pyqtSignal()	#pyside2 사용자는 pyqtSignal() -> Signal()로 변경
 			def eventFilter(self, obj, event):
@@ -55,20 +56,31 @@ class MainWindows(QMainWindow, form_class):
 					if event.type() == QEvent.MouseButtonPress:
 						if obj.rect().contains(event.pos()):
 							self.clicked.emit()
-							# for objName in self.objName_Li:
+							# for objName in objlist:
 							# 	if objName == obj:
-							# 		print(objName)
-							# The developer can opt for .emit(obj) to get the object within the slot.
+							# 		print("dfdd")
 							return True
 				return False
 		filter = Filter(widget)
 		widget.installEventFilter(filter)
+		#Filters List에 Filter리스트 저장. Filter의 순서가 Label이미지 순서와 동일.
+		filters.append(filter)
 		return filter.clicked
 	
 	def zoom_Image(self):
+		# Self.sender와 Filters 리스트의 index 필터링함.
 		print(self.sender())
-		if self.sender()==self.pic_1:
-			print("맞습니다")
+		index = 0
+		for filter in self.filters:
+			index += 1
+			if self.sender() == filter:
+				print(self.objName_Li[index])
+				
+		# if self.clickedList.count > 0:
+		# 	print(sender.findChild(self.clickedList[0]))
+		# if len(self.clickedList) > 0:
+		# 	print(self.clickedList[len(self.clickedList)])
+	
 
 	def change_page(self):
 		print(self.stackedWidget.currentIndex())
