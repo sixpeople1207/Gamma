@@ -9,7 +9,21 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication , QMainWindow, QFileDialog, QAction, QLabel, QSizePolicy
 from PyQt5.QtGui import *
 import sys
-from PyQt5.QtCore import Qt, QPoint, QCoreApplication, QObject, pyqtSignal, QEvent, QRect
+from PyQt5.QtCore import Qt, QPoint, QCoreApplication, QObject, pyqtSignal, QEvent, QRect, QThread
+import time
+
+class Thread1(QThread):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+
+    def run(self):
+        self.parent.pic_4.setText("진행률 시작했습니다.")
+        for i in range(20):
+            self.parent.pic_4.setText("진행률"+str(i)+"km째 달리고 있습니다.")
+            time.sleep(2)      
+        self.parent.pic_4.setText("진행률 완료.")
+	
 
 form_class = uic.loadUiType('./main.ui')[0]
 class MainWindows(QMainWindow, form_class):
@@ -47,7 +61,11 @@ class MainWindows(QMainWindow, form_class):
 			#이미지 파일도 받아와서 클릭하면 크게 보여줄 수 있게 수정.
 		self.isMaximized = 0
 		self.btn_settings.clicked.connect(self.change_page)
+		self.btn_save.clicked.connect(self.actionFunction1)
 
+	def actionFunction1(self):
+		h1 = Thread1(self)
+		h1.start()
 	
 	# Label에 클릭 이벤트를 연결.
 	def clickable(self,widget,objlist,filters):
@@ -92,7 +110,6 @@ class MainWindows(QMainWindow, form_class):
 			self.stackedWidget.setCurrentIndex(1)
 		elif(self.stackedWidget.currentIndex()==1):
 			self.stackedWidget.setCurrentIndex(0)
-
 
 	def dialog_fileOpen(self):
 		fname = QFileDialog.getExistingDirectory(self, '폴더선택', '')
