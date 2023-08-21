@@ -29,13 +29,15 @@ class MainWindows(QMainWindow, form_class):
 		self.objName_Li = [self.pic_1,self.pic_2,self.pic_3,self.pic_4,self.pic_5,self.pic_6,self.pic_7]
 		self.obj = []
 		self.filters = []
+		self.pathes = ['D:\\개인_프로그래밍 개발\\OpenCV_Source\\1.jpg','D:\\개인_프로그래밍 개발\\OpenCV_Source\\2 (2).jpg','D:\\개인_프로그래밍 개발\\OpenCV_Source\\3.jpg']
 		
 		#UI업데이트 :  pyrcc5 -o rc_rc.py rc.qrc
 		#8개가 가장 보기 좋음. 
-		for i in range(0,7):
+		for i in range(0,3):
 			self.imageLabel = self.objName_Li[i]
 			self.pixmap = QPixmap()
-			self.pixmap.load('D:\\개인_프로그래밍 개발\\OpenCV_Source\\1.jpg')
+			# self.pathes.append('D:\\개인_프로그래밍 개발\\OpenCV_Source\\1.jpg')
+			self.pixmap.load(self.pathes[i])
 			self.pixmap = self.pixmap.scaled(100,80)
 			self.imageLabel.setPixmap(self.pixmap)
 			self.imageLabel.setAlignment(Qt.AlignVCenter)
@@ -69,19 +71,21 @@ class MainWindows(QMainWindow, form_class):
 	
 	def zoom_Image(self):
 		# Self.sender와 Filters 리스트의 index 필터링함.
-		print(self.sender())
 		index = 0
+		# self.pathes.append('D:\\개인_프로그래밍 개발\\OpenCV_Source\\1.jpg')
 		for filter in self.filters:
-			index += 1
 			if self.sender() == filter:
+				pixmap = QPixmap(self.pathes[index])
+				pixmap = pixmap.scaled(500,300)
+				self.pic_Zoom.setPixmap(pixmap)
+				self.pic_Zoom.setAlignment(Qt.AlignVCenter)
 				print(self.objName_Li[index])
-				
+			index += 1
 		# if self.clickedList.count > 0:
 		# 	print(sender.findChild(self.clickedList[0]))
 		# if len(self.clickedList) > 0:
 		# 	print(self.clickedList[len(self.clickedList)])
 	
-
 	def change_page(self):
 		print(self.stackedWidget.currentIndex())
 		if(self.stackedWidget.currentIndex()==0):
