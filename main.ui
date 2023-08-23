@@ -1898,13 +1898,38 @@ QPushButton:pressed {
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLabel" name="label_15">
+                      <widget class="QLabel" name="label_total_count">
                        <property name="text">
                         <string>0 개</string>
                        </property>
                       </widget>
                      </item>
                     </layout>
+                   </widget>
+                   <widget class="QProgressBar" name="progressBar">
+                    <property name="geometry">
+                     <rect>
+                      <x>440</x>
+                      <y>13</y>
+                      <width>251</width>
+                      <height>16</height>
+                     </rect>
+                    </property>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="value">
+                     <number>0</number>
+                    </property>
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="textDirection">
+                     <enum>QProgressBar::TopToBottom</enum>
+                    </property>
                    </widget>
                    <zorder>layoutWidget</zorder>
                    <zorder>line_2</zorder>
@@ -1913,6 +1938,7 @@ QPushButton:pressed {
                    <zorder>horizontalLayoutWidget_4</zorder>
                    <zorder>line_3</zorder>
                    <zorder>horizontalLayoutWidget_5</zorder>
+                   <zorder>progressBar</zorder>
                   </widget>
                  </item>
                 </layout>

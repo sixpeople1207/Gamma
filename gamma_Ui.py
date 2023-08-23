@@ -13,19 +13,18 @@ from PyQt5.QtCore import Qt, QPoint, QCoreApplication, QObject, pyqtSignal, QEve
 import time
 
 class Thread1(QThread):
-    def __init__(self, parent):
-        super().__init__(parent)
-        self.parent = parent
+	def __init__(self, parent):
+		super().__init__(parent)
+		self.parent = parent
 
-    def run(self):
-        self.parent.pic_4.setText("진행률 시작했습니다.")
-        for i in range(20):
-            self.parent.pic_4.setText("진행률"+str(i)+"km째 달리고 있습니다.")
-            time.sleep(2)      
-        self.parent.pic_4.setText("진행률 완료.")
+	def run(self):
+		for i in range(20):
+			self.parent.progressBar.setValue(i+1)
+			time.sleep(1)  
 	
 
 form_class = uic.loadUiType('./main.ui')[0]
+
 class MainWindows(QMainWindow, form_class):
 	def __init__(self):
 		super().__init__()
@@ -43,21 +42,10 @@ class MainWindows(QMainWindow, form_class):
 		self.objName_Li = [self.pic_1,self.pic_2,self.pic_3,self.pic_4,self.pic_5,self.pic_6,self.pic_7]
 		self.obj = []
 		self.filters = []
-		self.pathes = ['D:\\개인_프로그래밍 개발\\OpenCV_Source\\1.jpg','D:\\개인_프로그래밍 개발\\OpenCV_Source\\2 (2).jpg','D:\\개인_프로그래밍 개발\\OpenCV_Source\\3.jpg']
+		self.path_li = []
 		
 		#UI업데이트 :  pyrcc5 -o rc_rc.py rc.qrc
-		#8개가 가장 보기 좋음. 
-		for i in range(0,3):
-			self.imageLabel = self.objName_Li[i]
-			self.pixmap = QPixmap()
-			# self.pathes.append('D:\\개인_프로그래밍 개발\\OpenCV_Source\\1.jpg')
-			self.pixmap.load(self.pathes[i])
-			self.pixmap = self.pixmap.scaled(100,80)
-			self.imageLabel.setPixmap(self.pixmap)
-			self.imageLabel.setAlignment(Qt.AlignVCenter)
-			# self.layout_ImagePreview.addWidget(self.imageLabel, i)
-			self.obj.append(self.imageLabel)
-			self.clickable(self.imageLabel,self.obj,self.filters).connect(self.zoom_Image)
+
 			#이미지 파일도 받아와서 클릭하면 크게 보여줄 수 있게 수정.
 		self.isMaximized = 0
 		self.btn_settings.clicked.connect(self.change_page)
@@ -93,7 +81,7 @@ class MainWindows(QMainWindow, form_class):
 		# self.pathes.append('D:\\개인_프로그래밍 개발\\OpenCV_Source\\1.jpg')
 		for filter in self.filters:
 			if self.sender() == filter:
-				pixmap = QPixmap(self.pathes[index])
+				pixmap = QPixmap(self.path_li[index])
 				pixmap = pixmap.scaled(500,300)
 				self.pic_Zoom.setPixmap(pixmap)
 				self.pic_Zoom.setAlignment(Qt.AlignVCenter)
@@ -114,15 +102,25 @@ class MainWindows(QMainWindow, form_class):
 	def dialog_fileOpen(self):
 		fname = QFileDialog.getExistingDirectory(self, '폴더선택', '')
 		if fname:
-			print(fname)
 			self.path_label.setText(fname)
 			path = fname + '/*.jpg'
 			file_list = glob.glob(path)
-			print(f"\n  {len(file_list)}개의 이미지가 검색되었습니다.")
-			# f = open(fname[0], 'r')
-			# with f:
-			# 	data = f.read()
-			# 	self.path_label.setText(fname[0])
+			self.path_li = file_list
+			self.show_imgae()
+
+	def show_imgae(self):
+		self.label_total_count.setText(str(len(self.path_li)))
+		for i in range(0,7):
+			self.imageLabel = self.objName_Li[i]
+			self.pixmap = QPixmap()
+			# self.pathes.append('D:\\개인_프로그래밍 개발\\OpenCV_Source\\1.jpg')
+			self.pixmap.load(self.path_li[i])
+			self.pixmap = self.pixmap.scaled(100,80)
+			self.imageLabel.setPixmap(self.pixmap)
+			self.imageLabel.setAlignment(Qt.AlignVCenter)
+			# self.layout_ImagePreview.addWidget(self.imageLabel, i)
+			self.obj.append(self.imageLabel)
+			self.clickable(self.imageLabel,self.obj,self.filters).connect(self.zoom_Image)
 
 	def window_maximized(self):
 		if(self.isMaximized == 0):
