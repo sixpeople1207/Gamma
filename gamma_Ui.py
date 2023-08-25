@@ -6,22 +6,40 @@ import os
 import sys
 from PyQt5 import uic
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication , QMainWindow, QFileDialog, QAction, QLabel, QSizePolicy
+from PyQt5.QtWidgets import QApplication , QMainWindow, QFileDialog, QAction, QLabel, QSizePolicy, QMessageBox
 from PyQt5.QtGui import *
 import sys
-from PyQt5.QtCore import Qt, QPoint, QCoreApplication, QObject, pyqtSignal, QEvent, QRect, QThread
+from PyQt5.QtCore import QMetaObject, Qt,QPoint, QCoreApplication, QObject, pyqtSignal, QEvent, QRect, QThread
 import time
 
 class Thread1(QThread):
+	sig = pyqtSignal(int)
 	def __init__(self, parent):
 		super().__init__(parent)
 		self.parent = parent
-
 	def run(self):
-		for i in range(20):
-			self.parent.progressBar.setValue(i+1)
-			time.sleep(1)  
-	
+		try:
+			for i in range(len(self.parent.path_li)):
+				self.sig.emit(i)
+				# self.parent.progressBar.setValue(i+1)
+				# QThread.sleep(1)  
+				for li in self.parent.path_li:
+					print(li)
+					image = cv2.imread(li)
+					filename = li.split('\\')
+					img_array = np.fromfile(li, np.uint8)
+
+					img_gamma = adjust_gamma(image, 2.0) # 감마값 적용
+					dst = img_gamma + (img_gamma-255)*0.6 ## 콘트라스트 적용
+					newPath = f'./{self.parent.folder_name}/{filename[len(filename)-1]}_.jpg'
+					msg = f'\r진행 수량 : {index+1}/{len(self.parent.path_li)}(완료/총계)'
+					index+=1
+					print(msg, end='')
+					cv2.imwrite(newPath, dst)
+				if index == len(self.parent.path_li):
+					print("작업이 완료 되었습니다.")
+		except Exception as E:
+			print(E)	
 
 form_class = uic.loadUiType('./main.ui')[0]
 
@@ -43,19 +61,20 @@ class MainWindows(QMainWindow, form_class):
 		self.obj = []
 		self.filters = []
 		self.path_li = []
-		
+		self.thread = Thread1(self)
+		self.btn_save.clicked.connect(lambda: self.thread.start())
+		self.thread.sig.connect(self.progressBar_SetValue)
 		#UI업데이트 :  pyrcc5 -o rc_rc.py rc.qrc
 
 			#이미지 파일도 받아와서 클릭하면 크게 보여줄 수 있게 수정.
 		self.isMaximized = 0
-		self.btn_settings.clicked.connect(self.change_page)
-		self.btn_save.clicked.connect(self.actionFunction1)
+		self.btn_settings.clicked.connect(self.progressBar_SetValue)
 
-	def actionFunction1(self):
-		h1 = Thread1(self)
-		h1.start()
-	
-	# Label에 클릭 이벤트를 연결.
+		# self.btn_save.clicked.connect(self.actionFunction1)
+
+	def progressBar_SetValue(self, t):
+		self.progressBar.setValue(t)
+
 	def clickable(self,widget,objlist,filters):
 		class Filter(QObject):
 			clicked = pyqtSignal()	#pyside2 사용자는 pyqtSignal() -> Signal()로 변경
@@ -109,7 +128,7 @@ class MainWindows(QMainWindow, form_class):
 			self.show_imgae()
 
 	def show_imgae(self):
-		self.label_total_count.setText(str(len(self.path_li)))
+		self.label_total_count.setText(str(len(self.path_li))+" 개")
 		for i in range(0,7):
 			self.imageLabel = self.objName_Li[i]
 			self.pixmap = QPixmap()
@@ -121,7 +140,9 @@ class MainWindows(QMainWindow, form_class):
 			# self.layout_ImagePreview.addWidget(self.imageLabel, i)
 			self.obj.append(self.imageLabel)
 			self.clickable(self.imageLabel,self.obj,self.filters).connect(self.zoom_Image)
+		QMessageBox.information(self,"Image Load","이미지 로드완료")
 
+	
 	def window_maximized(self):
 		if(self.isMaximized == 0):
 			self.setFixedSize(2400, 2400)
@@ -181,24 +202,4 @@ if __name__ == '__main__':
 	myWindow.show()
 	sys.exit(app.exec_())
 
-	# if(isRaw):
-	# 	folder_name = "new_images"
-	# 	current= os.getcwd() +f"\\{folder_name}"
-	# 	if not os.path.exists(current):
-	# 		os.makedirs(current)
-		
-	# 	for li in file_list:
-	# 		image = cv2.imread(li)
-	# 		filename = li.split('\\')
-	# 		img_gamma = adjust_gamma(image, 2.0) # 감마값 적용
-	# 		dst = img_gamma + (img_gamma-255)*0.6 ## 콘트라스트 적용
-	# 		newPath = f'./{folder_name}/{filename[len(filename)-1]}_.jpg'
-	# 		msg = f'\r진행 수량 : {index+1}/{len(file_list)}(완료/총계)'
-	# 		index+=1
-	# 		print(msg, end='')
-	# 		cv2.imwrite(newPath, dst)
-
-	# 	if index == len(file_list):
-	# 		print("작업이 완료 되었습니다.")
-	# else:
-	# 	print("폴더 확인 필요합니다.")
+	
