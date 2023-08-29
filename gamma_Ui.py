@@ -25,7 +25,7 @@ class Thread1(QThread):
 				# self.parent.progressBar.setValue(i+1)
 				# QThread.sleep(1)
 			for li in self.parent.path_li:
-				self.sig.emit(self.index)
+				self.sig.emit(self.index+1)
 				filename = li.split('\\')
 				img_array = np.fromfile(li, np.uint8)
 				curImg = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
@@ -39,7 +39,6 @@ class Thread1(QThread):
 				cv2.imwrite(newPath, dst)
 			if self.index == len(self.parent.path_li):
 				print("작업이 완료 되었습니다.")
-				QMessageBox.information(self.parent,"Image Load","이미지 저장완료")
 
 		except Exception as E:
 			print(E)	
@@ -77,6 +76,8 @@ class MainWindows(QMainWindow, form_class):
 
 	def progressBar_SetValue(self, t):
 		self.progressBar.setValue(t)
+		if t == len(self.path_li):
+			QMessageBox.information(self,"Image Load","이미지 저장완료")
 
 	def clickable(self,widget,objlist,filters):
 		class Filter(QObject):
