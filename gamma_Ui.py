@@ -29,14 +29,18 @@ class Thread1(QThread):
 				filename = li.split('\\')
 				img_array = np.fromfile(li, np.uint8)
 				curImg = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
-				#에러발생
 				img_gamma = adjust_gamma(curImg, 2.0) # 감마값 적용
 				dst = img_gamma + (img_gamma-255)*0.6 ## 콘트라스트 적용
-				newPath = f'./{self.parent.path_li}/{filename[len(filename)-1]}_.jpg'
 				msg = f'\r진행 수량 : {self.index+1}/{len(self.parent.path_li)}(완료/총계)'
 				self.index+=1
 				print(msg, end='')
-				cv2.imwrite(newPath, dst)
+				newPath = f'{self.parent.save_Path}\{filename[len(filename)-1]}_.jpg'
+				result, encoded_img = cv2.imencode('.jpg', dst)
+				
+				if result:
+					with open(newPath, mode='w+b') as f:
+						encoded_img.tofile(f)
+
 			if self.index == len(self.parent.path_li):
 				print("작업이 완료 되었습니다.")
 
@@ -64,14 +68,15 @@ class MainWindows(QMainWindow, form_class):
 		self.filters = []
 		self.path_li = []
 		self.thread = Thread1(self)
-		self.btn_save.clicked.connect(lambda: self.thread.start())
+		self.btn_save.clicked.connect(self.dialog_fileSave)
 		self.thread.sig.connect(self.progressBar_SetValue)
+		self.save_Path=""
 		#UI업데이트 :  pyrcc5 -o rc_rc.py rc.qrc
 
 			#이미지 파일도 받아와서 클릭하면 크게 보여줄 수 있게 수정.
 		self.isMaximized = 0
 		self.btn_settings.clicked.connect(self.progressBar_SetValue)
-
+		
 		# self.btn_save.clicked.connect(self.actionFunction1)
 
 	def progressBar_SetValue(self, t):
@@ -132,6 +137,12 @@ class MainWindows(QMainWindow, form_class):
 			self.show_imgae()
 			#ProgressBar 최대값 조정.
 			self.progressBar.setRange(0, len(self.path_li))
+
+	def dialog_fileSave(self):
+		fname = QFileDialog.getExistingDirectory(self, '폴더선택', '')
+		self.save_Path = fname
+		self.thread.start()
+		self.progressBar.setValue(0)
 
 	def show_imgae(self):
 		self.label_total_count.setText(str(len(self.path_li))+" 개")
