@@ -17,27 +17,30 @@ class Thread1(QThread):
 	def __init__(self, parent):
 		super().__init__(parent)
 		self.parent = parent
+		self.index=0
 	def run(self):
 		try:
-			for i in range(len(self.parent.path_li)):
-				self.sig.emit(i)
+			# for i in range(len(self.parent.path_li)):
+				# self.sig.emit(i)
 				# self.parent.progressBar.setValue(i+1)
-				# QThread.sleep(1)  
-				for li in self.parent.path_li:
-					print(li)
-					image = cv2.imread(li)
-					filename = li.split('\\')
-					img_array = np.fromfile(li, np.uint8)
+				# QThread.sleep(1)
+			for li in self.parent.path_li:
+				self.sig.emit(self.index)
+				filename = li.split('\\')
+				img_array = np.fromfile(li, np.uint8)
+				curImg = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+				#에러발생
+				img_gamma = adjust_gamma(curImg, 2.0) # 감마값 적용
+				dst = img_gamma + (img_gamma-255)*0.6 ## 콘트라스트 적용
+				newPath = f'./{self.parent.path_li}/{filename[len(filename)-1]}_.jpg'
+				msg = f'\r진행 수량 : {self.index+1}/{len(self.parent.path_li)}(완료/총계)'
+				self.index+=1
+				print(msg, end='')
+				cv2.imwrite(newPath, dst)
+			if self.index == len(self.parent.path_li):
+				print("작업이 완료 되었습니다.")
+				QMessageBox.information(self.parent,"Image Load","이미지 저장완료")
 
-					img_gamma = adjust_gamma(image, 2.0) # 감마값 적용
-					dst = img_gamma + (img_gamma-255)*0.6 ## 콘트라스트 적용
-					newPath = f'./{self.parent.folder_name}/{filename[len(filename)-1]}_.jpg'
-					msg = f'\r진행 수량 : {index+1}/{len(self.parent.path_li)}(완료/총계)'
-					index+=1
-					print(msg, end='')
-					cv2.imwrite(newPath, dst)
-				if index == len(self.parent.path_li):
-					print("작업이 완료 되었습니다.")
 		except Exception as E:
 			print(E)	
 
@@ -126,6 +129,8 @@ class MainWindows(QMainWindow, form_class):
 			file_list = glob.glob(path)
 			self.path_li = file_list
 			self.show_imgae()
+			#ProgressBar 최대값 조정.
+			self.progressBar.setRange(0, len(self.path_li))
 
 	def show_imgae(self):
 		self.label_total_count.setText(str(len(self.path_li))+" 개")
@@ -141,7 +146,6 @@ class MainWindows(QMainWindow, form_class):
 			self.obj.append(self.imageLabel)
 			self.clickable(self.imageLabel,self.obj,self.filters).connect(self.zoom_Image)
 		QMessageBox.information(self,"Image Load","이미지 로드완료")
-
 	
 	def window_maximized(self):
 		if(self.isMaximized == 0):
