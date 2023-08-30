@@ -6,7 +6,7 @@ import os
 import sys
 from PyQt5 import uic
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication , QMainWindow, QFileDialog, QAction, QLabel, QSizePolicy, QMessageBox
+from PyQt5.QtWidgets import QApplication , QMainWindow, QFileDialog, QAction, QLabel, QSizePolicy, QMessageBox, QDialogButtonBox
 from PyQt5.QtGui import *
 import sys
 from PyQt5.QtCore import QMetaObject, Qt,QPoint, QCoreApplication, QObject, pyqtSignal, QEvent, QRect, QThread
@@ -43,6 +43,7 @@ class Thread1(QThread):
 
 			if self.index == len(self.parent.path_li):
 				print("작업이 완료 되었습니다.")
+				## 완료시 Progress 값을 0으로 
 
 		except Exception as E:
 			print(E)	
@@ -72,8 +73,7 @@ class MainWindows(QMainWindow, form_class):
 		self.thread.sig.connect(self.progressBar_SetValue)
 		self.save_Path=""
 		#UI업데이트 :  pyrcc5 -o rc_rc.py rc.qrc
-
-			#이미지 파일도 받아와서 클릭하면 크게 보여줄 수 있게 수정.
+		#이미지 파일도 받아와서 클릭하면 크게 보여줄 수 있게 수정.
 		self.isMaximized = 0
 		self.btn_settings.clicked.connect(self.progressBar_SetValue)
 		
@@ -92,6 +92,7 @@ class MainWindows(QMainWindow, form_class):
 					if event.type() == QEvent.MouseButtonPress:
 						if obj.rect().contains(event.pos()):
 							self.clicked.emit()
+							print(obj)
 							# for objName in objlist:
 							# 	if objName == obj:
 							# 		print("dfdd")
@@ -140,9 +141,10 @@ class MainWindows(QMainWindow, form_class):
 
 	def dialog_fileSave(self):
 		fname = QFileDialog.getExistingDirectory(self, '폴더선택', '')
-		self.save_Path = fname
-		self.thread.start()
-		self.progressBar.setValue(0)
+		if fname:
+			self.save_Path = fname
+			self.thread.start()
+			self.progressBar.setValue(0)
 
 	def show_imgae(self):
 		self.label_total_count.setText(str(len(self.path_li))+" 개")
