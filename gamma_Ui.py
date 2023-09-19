@@ -132,7 +132,7 @@ class MainWindows(QMainWindow, form_class):
 		fname = QFileDialog.getExistingDirectory(self, '폴더선택', '')
 		if fname:
 			self.path_label.setText(fname)
-			path = fname + '/*.jpg'
+			path = fname + '/*.png'
 			file_list = glob.glob(path)
 			self.path_li = file_list
 			self.show_imgae()
@@ -147,19 +147,27 @@ class MainWindows(QMainWindow, form_class):
 			self.progressBar.setValue(0)
 
 	def show_imgae(self):
-		self.label_total_count.setText(str(len(self.path_li))+" 개")
-		for i in range(0,7):
-			self.imageLabel = self.objName_Li[i]
-			self.pixmap = QPixmap()
-			# self.pathes.append('D:\\개인_프로그래밍 개발\\OpenCV_Source\\1.jpg')
-			self.pixmap.load(self.path_li[i])
-			self.pixmap = self.pixmap.scaled(100,80)
-			self.imageLabel.setPixmap(self.pixmap)
-			self.imageLabel.setAlignment(Qt.AlignVCenter)
-			# self.layout_ImagePreview.addWidget(self.imageLabel, i)
-			self.obj.append(self.imageLabel)
-			self.clickable(self.imageLabel,self.obj,self.filters).connect(self.zoom_Image)
-		QMessageBox.information(self,"Image Load","이미지 로드완료")
+		if len(self.path_li) > 0:
+			self.label_total_count.setText(str(len(self.path_li))+" 개")
+			# 최대 보여지는 그림 갯수 지금은 7
+			if len(self.path_li) < 7:
+				max = len(self.path_li)
+			else:
+				max = 7 
+			for i in range(0,max):
+				self.imageLabel = self.objName_Li[i]
+				self.pixmap = QPixmap()
+				# self.pathes.append('D:\\개인_프로그래밍 개발\\OpenCV_Source\\1.jpg')
+				self.pixmap.load(self.path_li[i])
+				self.pixmap = self.pixmap.scaled(100,80)
+				self.imageLabel.setPixmap(self.pixmap)
+				self.imageLabel.setAlignment(Qt.AlignVCenter)
+				# self.layout_ImagePreview.addWidget(self.imageLabel, i)
+				self.obj.append(self.imageLabel)
+				self.clickable(self.imageLabel,self.obj,self.filters).connect(self.zoom_Image)
+			QMessageBox.information(self,"Image Load",str(len(self.path_li))+"개 로드완료")
+		else:
+			QMessageBox.information(self, "Image Load", "*.jpg 이미지가 없습니다.")
 	
 	def window_maximized(self):
 		if(self.isMaximized == 0):
